@@ -83,3 +83,7 @@ local.properties
 # Claude / tooling scratch
 # ---------------------------------------------------------------
 .claude/settings.local.json
+
+# Generated each build by com.unity.test-framework.performance
+/[Aa]ssets/[Rr]esources/PerformanceTestRunInfo.json*
+/[Aa]ssets/[Rr]esources/PerformanceTestRunSettings.json*
