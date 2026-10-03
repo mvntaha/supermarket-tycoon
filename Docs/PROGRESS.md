@@ -3,7 +3,7 @@
 | Phase | Name | Status | Gate | Tag |
 |---|---|---|---|---|
 | 0 | Research | **complete** — build confirmed, merged and tagged | user approves asset + toolchain checklist | `phase-0-research` |
-| 1 | Foundation | **in progress, blocked** | APK runs on phone, can walk and look | — |
+| 1 | Foundation | **in progress** — Task 0 done, Task 8 blocked on device | APK runs on phone, can walk and look | — |
 | 2 | Store core | not started | order, stock, price items | — |
 | 3 | Customers and checkout | not started | full buy-and-pay loop works | — |
 | 4 | Economy and progression | not started | real "one more day" loop, save/load | — |
@@ -125,8 +125,14 @@ mis-timed queue and a full disk, neither of them a project fault.
 
 ## Phase 1 — Foundation
 
-Branch `phase/1-foundation` — **not yet created.** Task 0.3 gates it, and Task 0.1 (build
-confirmation) gates Task 0.3, so no Phase 1 work has been committed.
+Branch `phase/1-foundation` — **created** off `develop` at `7cdc49b`. Task 0 is complete:
+the Phase 0 build is confirmed, `CLAUDE.md` is amended and in the repository, Phase 0 is
+merged to `develop` and `main`, and the annotated tag `phase-0-research` is pushed.
+
+Tasks 1–7 are authored but **not yet integrated into `Assets/`**, and Task 8 is blocked on
+the device. The APK that exists (`Builds/Android/Stockwell.apk`, 42.77 MiB) is the Phase 0
+empty-scene build, **not** a Phase 1 build — it has no player, no scenes and no HUD, so
+installing it would prove nothing about the Phase 1 gate.
 
 ### Task status
 
@@ -134,7 +140,8 @@ confirmation) gates Task 0.3, so no Phase 1 work has been committed.
 |---|---|---|---|
 | 0.1 | Confirm Phase 0 Android build result | **done** — attempt 3 Succeeded, 0 errors, 27 min 49 s, 42.77 MiB, ARM64-only verified | `340ddbd`, `7a89028` |
 | 0.2 | Amend `CLAUDE.md` (Phase 0 decisions, save/load to Phase 4) | **done** | `7a89028` |
-| 0.3 | Commit docs, merge to `develop` → `main`, tag `phase-0-research`, branch `phase/1-foundation` | **done** | `7a89028` + tag `phase-0-research` |
+| 0.3 | Commit docs, merge to `develop` → `main`, tag `phase-0-research`, branch `phase/1-foundation` | **done** | `b7df3f2`, merges `7cdc49b` (PR #1) + `3a03422` (PR #2), tag `phase-0-research`, branch created |
+| — | Android scripting defines + ignore `/.utmp/` | **done** (incidental) | `37a2eb5` |
 | 1 | Project folders, import 3 Kenney packs, URP convert, record attribution | **not done** — packs downloaded and verified, not imported | — |
 | 2 | Scenes (`Bootstrap`/`City`/`Store`) + `GameServices` bootstrap | **not done** — scripts authored, not integrated | — |
 | 3 | Input: one action map, touch HUD, mobile-only visibility | **not done** — action asset and scripts authored, not integrated | — |
