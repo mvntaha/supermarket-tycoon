@@ -132,9 +132,9 @@ confirmation) gates Task 0.3, so no Phase 1 work has been committed.
 
 | Task | What | Status | Commit |
 |---|---|---|---|
-| 0.1 | Confirm Phase 0 Android build result | **done** — attempt 3 Succeeded, 0 errors, 27 min 49 s, 42.77 MiB, ARM64-only verified | `340ddbd`, `24859ce` |
-| 0.2 | Amend `CLAUDE.md` (Phase 0 decisions, save/load to Phase 4) | **done** | `24859ce` |
-| 0.3 | Commit docs, merge to `develop` → `main`, tag `phase-0-research`, branch `phase/1-foundation` | **done** | `24859ce` + tag `phase-0-research` |
+| 0.1 | Confirm Phase 0 Android build result | **done** — attempt 3 Succeeded, 0 errors, 27 min 49 s, 42.77 MiB, ARM64-only verified | `340ddbd`, `7a89028` |
+| 0.2 | Amend `CLAUDE.md` (Phase 0 decisions, save/load to Phase 4) | **done** | `7a89028` |
+| 0.3 | Commit docs, merge to `develop` → `main`, tag `phase-0-research`, branch `phase/1-foundation` | **done** | `7a89028` + tag `phase-0-research` |
 | 1 | Project folders, import 3 Kenney packs, URP convert, record attribution | **not done** — packs downloaded and verified, not imported | — |
 | 2 | Scenes (`Bootstrap`/`City`/`Store`) + `GameServices` bootstrap | **not done** — scripts authored, not integrated | — |
 | 3 | Input: one action map, touch HUD, mobile-only visibility | **not done** — action asset and scripts authored, not integrated | — |
