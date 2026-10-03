@@ -2,7 +2,7 @@
 
 | Phase | Name | Status | Gate | Tag |
 |---|---|---|---|---|
-| 0 | Research | **blocked on build confirmation** | user approves asset + toolchain checklist | `phase-0-research` (not yet cut) |
+| 0 | Research | **complete** — build confirmed, merged and tagged | user approves asset + toolchain checklist | `phase-0-research` |
 | 1 | Foundation | **in progress, blocked** | APK runs on phone, can walk and look | — |
 | 2 | Store core | not started | order, stock, price items | — |
 | 3 | Customers and checkout | not started | full buy-and-pay loop works | — |
@@ -72,9 +72,28 @@ Android settings verified intact after the restart, read straight from
 `m_APIs: 150000000b000000` (Vulkan `0x15`, OpenGLES3 `0x0b`) with `m_Automatic: 0`,
 `AndroidMinSdkVersion: 31`, `applicationIdentifier.Android: com.stockwell.game`.
 
-**Attempt 3 — in progress at the time of writing.** Passed script compilation, 44
-compute shaders, IL2CPP conversion and the `libunity.so` ARM64 native link; currently in
-Gradle assembly with ~17 GB free. APK size and build time to be appended when it lands.
+**Attempt 3 — SUCCEEDED.**
+
+| | |
+|---|---|
+| Result | `Succeeded` |
+| Errors | **0** |
+| Warnings | 971 (clang `-Wunused-command-line-argument` and shader-variant noise; none actionable) |
+| Build time | **1,669,375 ms — 27 min 49 s** |
+| Started / ended | 2026-10-03 16:38:07Z → 17:05:56Z |
+| APK | `Builds/Android/Stockwell.apk` |
+| **APK size** | **44,845,533 bytes (42.77 MiB)** |
+
+APK verified by inspecting the archive rather than trusting the report:
+
+- `lib/` contains **`arm64-v8a/` only** — no `armeabi-v7a`, no `x86`. ARM64-only confirmed.
+- `lib/arm64-v8a/libil2cpp.so` present (61.7 MB uncompressed) — IL2CPP backend confirmed.
+- Also `libunity.so` (19.6 MB), `libmain.so`, `libgame.so`, `libc++_shared.so`,
+  `lib_burst_generated.so`.
+
+**Phase 0's exit criterion is met: an empty scene builds to an Android APK, ARM64, IL2CPP.**
+The pipeline configuration was correct all along; the two earlier failures were a
+mis-timed queue and a full disk, neither of them a project fault.
 
 > **Build-time finding.** ~10 of the ~37 minutes is Unity compiling **44 Sentis compute
 > shaders** from `com.unity.ai.inference` — a neural-network runtime this game never uses.
@@ -113,9 +132,9 @@ confirmation) gates Task 0.3, so no Phase 1 work has been committed.
 
 | Task | What | Status | Commit |
 |---|---|---|---|
-| 0.1 | Confirm Phase 0 Android build result | **partially done** — attempts 1 and 2 recorded above with exact errors; attempt 3 running | — |
-| 0.2 | Amend `CLAUDE.md` (Phase 0 decisions, save/load to Phase 4) | **done, uncommitted** | — |
-| 0.3 | Commit docs, merge to `develop` → `main`, tag `phase-0-research`, branch `phase/1-foundation` | **not done** — gated on 0.1 | — |
+| 0.1 | Confirm Phase 0 Android build result | **done** — attempt 3 Succeeded, 0 errors, 27 min 49 s, 42.77 MiB, ARM64-only verified | `340ddbd`, `24859ce` |
+| 0.2 | Amend `CLAUDE.md` (Phase 0 decisions, save/load to Phase 4) | **done** | `24859ce` |
+| 0.3 | Commit docs, merge to `develop` → `main`, tag `phase-0-research`, branch `phase/1-foundation` | **done** | `24859ce` + tag `phase-0-research` |
 | 1 | Project folders, import 3 Kenney packs, URP convert, record attribution | **not done** — packs downloaded and verified, not imported | — |
 | 2 | Scenes (`Bootstrap`/`City`/`Store`) + `GameServices` bootstrap | **not done** — scripts authored, not integrated | — |
 | 3 | Input: one action map, touch HUD, mobile-only visibility | **not done** — action asset and scripts authored, not integrated | — |
