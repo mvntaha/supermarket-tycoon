@@ -1,0 +1,85 @@
+# ---------------------------------------------------------------
+# Unity generated / machine-local folders
+# ---------------------------------------------------------------
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+
+# Asset Store / package caches
+/[Aa]ssets/AssetStoreTools*
+/[Aa]ssets/Plugins/Editor/JetBrains*
+
+# ---------------------------------------------------------------
+# Build output (local APK/AAB test builds live outside git)
+# ---------------------------------------------------------------
+*.apk
+*.aab
+*.unitypackage
+*.app
+/Builds/
+
+# ---------------------------------------------------------------
+# IDE / editor files
+# ---------------------------------------------------------------
+.vs/
+.vscode/
+.idea/
+*.csproj
+*.unityproj
+*.sln
+*.slnx
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+.vsconfig
+
+# Rider
+/[Aa]ssets/Plugins/Editor/JetBrains*
+
+# ---------------------------------------------------------------
+# OS cruft
+# ---------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+[Tt]humbs.db
+desktop.ini
+
+# ---------------------------------------------------------------
+# Crash / profiling artefacts
+# ---------------------------------------------------------------
+sysinfo.txt
+crashlytics-build.properties
+/[Aa]ssets/[Ss]treamingAssets/aa.meta
+/[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# ---------------------------------------------------------------
+# Secrets / signing (never commit a keystore)
+# ---------------------------------------------------------------
+*.keystore
+*.jks
+!/[Aa]ssets/**/*.keystore.meta
+keystore.properties
+local.properties
+
+# ---------------------------------------------------------------
+# Claude / tooling scratch
+# ---------------------------------------------------------------
+.claude/settings.local.json
