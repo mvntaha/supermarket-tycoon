@@ -2,11 +2,11 @@
 
 | Phase | Name | Status | Gate | Tag |
 |---|---|---|---|---|
-| 0 | Research | **awaiting user approval** | user approves asset + toolchain checklist | `phase-0-research` (not yet cut) |
-| 1 | Foundation | not started | APK runs on phone, can walk and look | — |
+| 0 | Research | **blocked on build confirmation** | user approves asset + toolchain checklist | `phase-0-research` (not yet cut) |
+| 1 | Foundation | **in progress, blocked** | APK runs on phone, can walk and look | — |
 | 2 | Store core | not started | order, stock, price items | — |
 | 3 | Customers and checkout | not started | full buy-and-pay loop works | — |
-| 4 | Economy and progression | not started | real "one more day" loop | — |
+| 4 | Economy and progression | not started | real "one more day" loop, save/load | — |
 | 5 | World and menu | not started | start-to-finish flow works | — |
 | 6 | Optimization and polish | not started | stable on-device build | — |
 
@@ -16,56 +16,158 @@
 
 Branch `phase/0-research`. Deliverables: [ASSETS.md](ASSETS.md), [TOOLCHAIN.md](TOOLCHAIN.md), [PLAN_CHECK.md](PLAN_CHECK.md), [VERSION_CONTROL.md](VERSION_CONTROL.md).
 
+### Commits
+
+| Hash | Subject |
+|---|---|
+| `92ab673` | chore: initialize Unity 6 URP project with git and LFS |
+| `c5f47d2` | docs: Phase 0 research deliverables and Android build config |
+
 ### Done
 
-**Task A — toolchain**
+**Task A — toolchain.** MCP chosen and verified (official Unity CLI MCP server, `unity mcp`, CLI `1.0.0-beta.5`): read, create, edit and compile all confirmed. Android toolchain audited — everything already installed (SDK 34–37, build-tools 36.0.0, NDK r27c, OpenJDK Temurin 17.0.18, adb). Project adopted rather than recreated (Unity `6000.3.24f1`, URP `17.3.0`); compiles clean. Git initialized with Unity `.gitignore`, `.gitattributes` (unityyamlmerge + LFS, verified by committed pointer). Android player settings applied and read back: `IL2CPP, ARM64, Vulkan+GLES3, LandscapeLeft, minSdk 31, com.stockwell.game`.
 
-- MCP chosen and verified: **official Unity CLI MCP server** (`unity mcp`, Unity CLI `1.0.0-beta.5`). Read, create, edit and compile all confirmed working against the live editor. Rationale and rejected alternatives in `TOOLCHAIN.md`.
-- Android toolchain audited — **everything was already installed**, nothing to add: Android Build Support on `6000.3.24f1`, SDK platforms 34–37, build-tools 36.0.0, NDK r27c (`27.2.12479018`), OpenJDK Temurin `17.0.18+8`, adb.
-- Project adopted rather than recreated: Unity `6000.3.24f1`, URP `17.3.0`, mobile + PC render pipeline assets already present from the URP template. **Compiles clean, zero errors.**
-- Git initialized with a Unity `.gitignore`, `.gitattributes` (unityyamlmerge + LFS), remote set to `mvntaha/supermarket-tycoon`, branch model in `VERSION_CONTROL.md`. LFS verified by committed pointer.
-- Android player settings applied and read back: `backend=IL2CPP arch=ARM64 apis=Vulkan,OpenGLES3 orient=LandscapeLeft minSdk=AndroidApiLevel31 id=com.stockwell.game`.
+**Task B — assets.** 17-pack shortlist, every one CC0, in `ASSETS.md`. Two hard gaps (checkout register, shopping basket), three soft gaps, no phase blocked. Mixamo eliminated as a dependency — Quaternius ships 24 CC0 animations with a humanoid rig.
 
-**Task B — asset research**
+**Task C — name check.** "Stockwell" clear on Steam and itch.io. Google Play not checkable programmatically.
 
-- Full shortlist in `ASSETS.md`: 17 recommended packs across all six categories, **every one CC0**, with a pick and a backup each, licence table, URP status, poly/mobile cost notes and style-mismatch risks.
-- Two hard gaps (checkout register, shopping basket) and three soft gaps identified, all with resolutions; **no phase is blocked**.
-- The brief's one external dependency, Mixamo, was eliminated — Quaternius ships 24 CC0 animations with a humanoid rig.
+### Android APK build test — the real outcome
 
-**Task C — name check**
+Target: Android, ARM64, IL2CPP, Vulkan + GLES3. Scene: `Assets/Scenes/SampleScene.unity` (camera, directional light, global volume). Output path: `Builds/Android/Stockwell.apk`.
 
-- **"Stockwell" is clear** on Steam and itch.io. No fallback name needed. Google Play could not be checked programmatically; manual check advised before any store listing.
+**Attempt 1 — FAILED (misfire, not a real attempt).**
+`Error building Player because scripts are compiling`. The build was queued into the domain reload triggered by the Mono→IL2CPP switch. Report came back hollow (`platform: NoTarget`, 0 bytes, 0 ms). Retried after the editor reported idle.
 
-### Build test
+**Attempt 2 — FAILED after 37 minutes. Exact error:**
 
-Android APK build of the near-empty template scene (`SampleScene`: camera, directional light, global volume), ARM64 / IL2CPP.
+```
+java.io.UncheckedIOException: java.io.IOException: There is not enough space on the disk
+Caused by: java.io.IOException: Could not add entry
+  'C:\Users\ahmed\.gradle\caches\9.1.0\transforms\c2f0c829caf2cb6ef2061250e2cc00c0'
+  to cache file-access.bin (C:\Users\ahmed\.gradle\caches\journal-1\file-access.bin).
+```
 
-| | |
+The C: drive reached **0 bytes free** (195 GB / 195 GB) during the Gradle stage. The
+disk-full condition corrupted Gradle's cache journal mid-write, and the build then hung
+rather than failing cleanly — Unity's main thread stayed blocked on a Gradle process that
+could no longer make progress. `editor_status` timed out while the editor's own
+`groundTruth` still reported it healthy.
+
+Not a project, toolchain or configuration fault. The pipeline configuration itself was
+never shown to be wrong.
+
+**Remediation applied** (user-authorized):
+
+| Action | Freed |
 |---|---|
-| Target | Android, ARM64, IL2CPP, Vulkan + GLES3 |
-| Scene | `Assets/Scenes/SampleScene.unity` (build index 0) |
-| Output | `Builds/Android/Stockwell.apk` |
-| Result | _recorded below_ |
+| Killed the wedged Gradle daemons and the blocked editor | ~4.3 GB (released mappings) |
+| Deleted the corrupted `~/.gradle/caches` and `~/.gradle/daemon` | 0.15 GB |
+| Deleted `Library/Bee` (IL2CPP + build intermediates) and `Temp/` | ~6 GB |
+| **Free space before → after** | **3.84 GB → 17.8 GB** |
 
-First attempt failed with `Error building Player because scripts are compiling` — the Mono→IL2CPP switch had triggered a domain reload and the build was queued into it. Retried after the editor reported idle. **Worth remembering for later phases: always confirm `editor_status` is `ready` before queueing a build**, especially right after changing a player setting that forces a domain reload.
+Editor relaunched; project reloaded in ~10 minutes (asset database refresh 347 s). All
+Android settings verified intact after the restart, read straight from
+`ProjectSettings/ProjectSettings.asset`: `defaultScreenOrientation: 3` (LandscapeLeft),
+`AndroidTargetArchitectures: 2` (ARM64), `scriptingBackend.Android: 1` (IL2CPP),
+`m_APIs: 150000000b000000` (Vulkan `0x15`, OpenGLES3 `0x0b`) with `m_Automatic: 0`,
+`AndroidMinSdkVersion: 31`, `applicationIdentifier.Android: com.stockwell.game`.
 
-> **Result:** see the note appended at the end of this file once the build settled.
+**Attempt 3 — in progress at the time of writing.** Passed script compilation, 44
+compute shaders, IL2CPP conversion and the `libunity.so` ARM64 native link; currently in
+Gradle assembly with ~17 GB free. APK size and build time to be appended when it lands.
 
-### Frame-time log
+> **Build-time finding.** ~10 of the ~37 minutes is Unity compiling **44 Sentis compute
+> shaders** from `com.unity.ai.inference` — a neural-network runtime this game never uses.
+> Confirmed removable: it is **not** a dependency of `com.unity.ai.assistant` (which the
+> MCP needs). `visualscripting`, `multiplayer.center` and `collab-proxy` are also unused.
+> Dropping them would cut roughly a third off every future Android build. Offered and
+> declined for now; re-raising with measured numbers.
 
-Not applicable in Phase 0 (no gameplay, no device run). Per `PLAN_CHECK.md` B2, Phase 1 starts `Docs/PERF_LOG.md` with one row per phase and defines "stable 30 fps" as **1% low ≥ 30 fps**, not average.
+### Two tooling gotchas worth remembering
 
-### Decisions carried into Phase 1
-
-From `PLAN_CHECK.md`, four things are cheaper to decide now than to refactor later:
-
-1. **A1** — scanning interaction: one tap per item inside the existing raycast interact system.
-2. **A2** — service locator shape: one `GameServices` bootstrap, settled while there is nothing to migrate.
-3. **B3** — store/city scene boundary: two scenes, additive load at the door, city unloaded while inside.
-4. **B4** — anchor touch UI to safe-area insets from the first HUD, not as Phase 6 polish.
+1. **Always confirm `editor_status` is `ready` before `build`.** A build queued during a
+   domain reload fails with a hollow report rather than a clear error.
+2. **The editor must be focused for MCP main-thread operations.** After the restart every
+   `editor_status` and `eval` timed out at 60 s while the editor was healthy and idle.
+   Cause: `com.unity.ai.assistant` blocking the main thread on an Account API check —
+   its own warning says "due to network issues or **editor focus**". A single
+   `editor_focus` call cleared it immediately. Related to the Unity licence entitlement
+   `404`s already flagged in `TOOLCHAIN.md`.
 
 ### Open for the user
 
-- Approve the asset set in `ASSETS.md` (or cut/substitute packs).
-- Confirm the two hard gaps are authored in-house in Phase 3 rather than searched for further.
-- Note the Unity licence entitlement errors in the editor log — non-blocking now, worth resolving before a signed release build.
+- Approve the asset set in `ASSETS.md`.
+- Confirm the two hard gaps are authored in-house in Phase 3.
+- Unity licence entitlement `404`s — non-blocking, but resolve before a signed release build.
+- **Disk headroom.** 191 of 195 GB was in use before this clear. Android IL2CPP builds need
+  several GB of transient space; the project will keep hitting this.
+
+---
+
+## Phase 1 — Foundation
+
+Branch `phase/1-foundation` — **not yet created.** Task 0.3 gates it, and Task 0.1 (build
+confirmation) gates Task 0.3, so no Phase 1 work has been committed.
+
+### Task status
+
+| Task | What | Status | Commit |
+|---|---|---|---|
+| 0.1 | Confirm Phase 0 Android build result | **partially done** — attempts 1 and 2 recorded above with exact errors; attempt 3 running | — |
+| 0.2 | Amend `CLAUDE.md` (Phase 0 decisions, save/load to Phase 4) | **done, uncommitted** | — |
+| 0.3 | Commit docs, merge to `develop` → `main`, tag `phase-0-research`, branch `phase/1-foundation` | **not done** — gated on 0.1 | — |
+| 1 | Project folders, import 3 Kenney packs, URP convert, record attribution | **not done** — packs downloaded and verified, not imported | — |
+| 2 | Scenes (`Bootstrap`/`City`/`Store`) + `GameServices` bootstrap | **not done** — scripts authored, not integrated | — |
+| 3 | Input: one action map, touch HUD, mobile-only visibility | **not done** — action asset and scripts authored, not integrated | — |
+| 4 | Player controller + raycast interaction + door | **not done** — scripts authored, not integrated | — |
+| 5 | HUD canvas + `SafeArea` + 48 dp touch targets | **not done** — scripts authored, not integrated | — |
+| 6 | Quality profiles, `targetFrameRate`, perf overlay, `PERF_LOG.md` | **partially done** — `PERF_LOG.md` created with headers; overlay authored, not integrated | — |
+| 7 | Footsteps | **not done** — script authored, not integrated | — |
+| 8 | Build and device test | **blocked** — see below | — |
+
+**No commit hashes exist for Phase 1 yet.** Nothing has been committed because Task 0.3
+has not run, and the brief requires work to happen on `phase/1-foundation`.
+
+### Work prepared but not applied
+
+21 C# scripts authored (`Core`, `Input`, `World`, `Player`, `UI`, `Diagnostics`, `Audio`)
+and a rewritten `InputSystem_Actions.inputactions` with a single `Gameplay` map
+(Move, Look, Interact, PickUpDrop, Place; WASD + arrows, mouse delta, E/Q/F). JSON
+validated. All three Kenney packs downloaded (3.67 MB) and their contents verified;
+attribution recorded in `ASSETS.md`. None of it is in `Assets/` yet.
+
+Design note: the touch stick and look-drag area are built on Unity UI **pointer events**
+rather than the Input System's `OnScreenStick`, because the EventSystem tracks one
+pointer per finger. That is what makes simultaneous walk-and-look work; two on-screen
+controls bound to the same virtual device fight each other.
+
+### Task 8 — device test: BLOCKED, not skipped
+
+**`adb devices` does not list the phone.** Per the brief, stopping rather than skipping.
+
+```
+$ adb devices -l
+List of devices attached
+(empty)
+```
+
+Diagnostics run:
+
+| Check | Result |
+|---|---|
+| `adb kill-server` + `start-server` | daemon restarted cleanly, still no devices |
+| `adb version` | 1.0.41 / 36.0.0-13206524 (matches the installed SDK) |
+| Windows PnP — ADB interface, portable/WPD, or any Android-named device | **none present** |
+| Windows PnP — devices in a non-OK state | only unrelated entries (PS/2 keyboard, PCI controllers, Intel XTU) |
+| USB-class devices present | 3 — a minimal set, no phone among them |
+
+**Interpretation.** Windows is not seeing the phone at all, so this is upstream of adb
+and upstream of USB-debugging authorization. An unauthorized-but-connected phone would
+still appear (as `unauthorized`, and as an ADB interface in PnP). Nothing appears.
+
+Most likely causes, in order: a charge-only USB cable (very common — many bundled cables
+carry no data lines), the phone's USB mode left on "No data transfer"/charging, a dead or
+power-only USB port, or the cable not fully seated.
+
+Both `PERF_LOG.md` rows and the City/Store screenshots stay empty until the device is
+reachable. **The Phase 1 gate cannot be met without them.**

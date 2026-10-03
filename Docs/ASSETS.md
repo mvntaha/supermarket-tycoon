@@ -241,8 +241,37 @@ Everything else arrives at the phase that needs it: products and fixtures in Pha
 
 ## Attribution record
 
-To be filled in as packs are imported, so the Credits screen can be generated from this table.
+Filled in as packs are imported, so the Credits screen can be generated from this table.
 
-| Pack | Author | Licence | Imported | Credit required | Credit line |
-|---|---|---|---|---|---|
-| _(none imported yet)_ | | | | | |
+| Pack | Author | Licence | Version | Imported | Download size | Credit required | Credit line |
+|---|---|---|---|---|---|---|---|
+| Modular Buildings | Kenney | CC0 1.0 | 2.1 (2024-02-08) | Phase 1 | 1,825,490 B (1.74 MB) | **No** | Kenney — www.kenney.nl |
+| UI Pack | Kenney | CC0 1.0 | — | Phase 1 | 1,229,750 B (1.17 MB) | **No** | Kenney — www.kenney.nl |
+| Impact Sounds | Kenney | CC0 1.0 | — | Phase 1 (subset) | 800,850 B (0.76 MB) | **No** | Kenney — www.kenney.nl |
+
+Total Phase 1 import: **3.67 MB** downloaded. Credit is voluntary for all three — the
+bundled `License.txt` states plainly that crediting Kenney "is not a requirement".
+
+### Verified at import
+
+- **Modular Buildings** — 108 models each in FBX, OBJ and GLB, plus `Models/Textures/`
+  containing **exactly two PNGs** (`variation-a.png`, `variation-b.png`) shared by every
+  model. This confirms the one-material-per-kit assumption the mobile cost assessment
+  depends on: the whole building set collapses to two materials.
+- **Impact Sounds** — 130 clips, **all already OGG** (no WAV in the pack, so no
+  conversion needed). Footsteps ship as 5 variants each for carpet, concrete, grass,
+  snow and wood. Imported subset only, per the Phase 1 brief.
+- **UI Pack** — PNG at two densities plus SVG vector sources, 2 TTF fonts, 6 UI SFX.
+
+### Impact Sounds — imported subset
+
+Only the files actually used, rather than all 130:
+
+| Files | Use |
+|---|---|
+| `footstep_concrete_000`–`004` | City scene footsteps |
+| `footstep_wood_000`–`004` | Store scene footsteps |
+| `impactGeneric_light_000`–`004` | box pickup / thud, for Phase 2 delivery boxes |
+
+15 clips. The pack has no `impactWood`; `impactGeneric_light` is the closest match for
+a cardboard box and is the lightest-sounding of the available impact families.
