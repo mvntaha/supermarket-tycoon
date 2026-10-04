@@ -142,34 +142,32 @@ installing it would prove nothing about the Phase 1 gate.
 | 0.2 | Amend `CLAUDE.md` (Phase 0 decisions, save/load to Phase 4) | **done** | `7a89028` |
 | 0.3 | Commit docs, merge to `develop` → `main`, tag `phase-0-research`, branch `phase/1-foundation` | **done** | `b7df3f2`, merges `7cdc49b` (PR #1) + `3a03422` (PR #2), tag `phase-0-research`, branch created |
 | — | Android scripting defines + ignore `/.utmp/` | **done** (incidental) | `37a2eb5` |
-| 1 | Project folders, import 3 Kenney packs, URP convert, record attribution | **not done** — packs downloaded and verified, not imported | — |
-| 2 | Scenes (`Bootstrap`/`City`/`Store`) + `GameServices` bootstrap | **not done** — scripts authored, not integrated | — |
-| 3 | Input: one action map, touch HUD, mobile-only visibility | **not done** — action asset and scripts authored, not integrated | — |
-| 4 | Player controller + raycast interaction + door | **not done** — scripts authored, not integrated | — |
-| 5 | HUD canvas + `SafeArea` + 48 dp touch targets | **not done** — scripts authored, not integrated | — |
-| 6 | Quality profiles, `targetFrameRate`, perf overlay, `PERF_LOG.md` | **partially done** — `PERF_LOG.md` created with headers; overlay authored, not integrated | — |
-| 7 | Footsteps | **not done** — script authored, not integrated | — |
-| 8 | Build and device test | **blocked** — see below | — |
+| 1 | Project folders, import 3 Kenney packs, URP convert, record attribution | **done** | `80d487c` |
+| 2 | Scenes (`Bootstrap`/`City`/`Store`) + `GameServices` bootstrap | **done** | `ffabddb` |
+| 3 | Input: one action map, touch HUD, mobile-only visibility | **done** | `c03d234` |
+| 4 | Player controller + raycast interaction + door | **done** | `ea2b0d9` |
+| 5 | HUD canvas + `SafeArea` + 48 dp touch targets | **done** | `1548b06` |
+| 6 | Quality profiles, `targetFrameRate`, perf overlay, `PERF_LOG.md` | **done** | `f806493` |
+| 7 | Footsteps | **done** | `7f146e3` |
+| 8 | Build and device test | **awaiting the user's device test** — APK built, on-device run not performed | Step E below |
 
-**No commit hashes exist for Phase 1 yet.** Nothing has been committed because Task 0.3
-has not run, and the brief requires work to happen on `phase/1-foundation`.
+Supporting steps on this branch:
 
-### Work prepared but not applied
-
-21 C# scripts authored (`Core`, `Input`, `World`, `Player`, `UI`, `Diagnostics`, `Audio`)
-and a rewritten `InputSystem_Actions.inputactions` with a single `Gameplay` map
-(Move, Look, Interact, PickUpDrop, Place; WASD + arrows, mouse delta, E/Q/F). JSON
-validated. All three Kenney packs downloaded (3.67 MB) and their contents verified;
-attribution recorded in `ASSETS.md`. None of it is in `Assets/` yet.
+| Step | What | Commit |
+|---|---|---|
+| A | Removed `ai.inference`, `visualscripting`, `multiplayer.center`, `collab-proxy` | `5ce7fb8`, `48b5890` |
+| C | Editor smoke test of the full loop | `01bf4ee`, corrected by `23246ad` |
+| D | Refreshed `ASSETS.md` header and `VERSION_CONTROL.md` branch list | `260c4c0` |
 
 Design note: the touch stick and look-drag area are built on Unity UI **pointer events**
 rather than the Input System's `OnScreenStick`, because the EventSystem tracks one
 pointer per finger. That is what makes simultaneous walk-and-look work; two on-screen
 controls bound to the same virtual device fight each other.
 
-### Task 8 — device test: BLOCKED, not skipped
+### Task 8 — device test: awaiting the user
 
-**`adb devices` does not list the phone.** Per the brief, stopping rather than skipping.
+The user will run this themselves. At the time the APK was built, `adb devices` listed
+no phone; the diagnostics below are kept because they narrow down what to check.
 
 ```
 $ adb devices -l
@@ -195,8 +193,8 @@ Most likely causes, in order: a charge-only USB cable (very common — many bund
 carry no data lines), the phone's USB mode left on "No data transfer"/charging, a dead or
 power-only USB port, or the cable not fully seated.
 
-Both `PERF_LOG.md` rows and the City/Store screenshots stay empty until the device is
-reachable. **The Phase 1 gate cannot be met without them.**
+Both `PERF_LOG.md` rows stay empty until the device run. **The Phase 1 gate is not met**
+and is not claimed. Editor screenshots exist, but editor numbers are not device numbers.
 
 ### Step A — unused package removal
 
@@ -298,3 +296,87 @@ successfully through `InputService.FireInteract()`, which is exactly what `Touch
 calls on pointer down. That completed the Store→City transition, so the
 input → interactor → door → scene-service chain is proven; only the synthetic-keystroke
 delivery is unproven. The keyboard bindings are worth a manual check in the editor.
+
+---
+
+## Device test checklist (Task 8) — for the user to run
+
+Nothing below has been done. Every box is unchecked because the on-device run is yours.
+The list is derived from Task 8 of the Phase 1 brief and the Phase 1 gate in `CLAUDE.md`
+("APK runs on phone, can walk and look"); the brief itself is not in the repo.
+
+### Install
+
+Confirm the phone is visible first — it must print a serial followed by `device`, not
+`unauthorized` and not an empty list:
+
+```bash
+"/c/Program Files/Unity/Hub/Editor/6000.3.24f1/Editor/Data/PlaybackEngines/AndroidPlayer/SDK/platform-tools/adb.exe" devices -l
+```
+
+Then install, replacing any existing copy:
+
+```bash
+"/c/Program Files/Unity/Hub/Editor/6000.3.24f1/Editor/Data/PlaybackEngines/AndroidPlayer/SDK/platform-tools/adb.exe" install -r "C:/Users/ahmed/Supermarket Tycoon/Builds/Android/Stockwell-phase1-dev.apk"
+```
+
+Watch the log while playing (Unity's own output only, which is where any C# exception
+will appear):
+
+```bash
+"/c/Program Files/Unity/Hub/Editor/6000.3.24f1/Editor/Data/PlaybackEngines/AndroidPlayer/SDK/platform-tools/adb.exe" logcat -s Unity:V
+```
+
+### Checklist
+
+- [ ] APK installs without error and the app launches
+- [ ] Bootstrap hands off to City — you start outdoors on the street, not on a black screen
+- [ ] Left thumb on the stick walks; movement direction follows where you are looking
+- [ ] Right side of the screen drags to look; pitch stops at about 85° up and down
+- [ ] **Walking and looking at the same time, two thumbs** — this is the one that justifies
+      the pointer-event approach over `OnScreenStick`, so test it deliberately
+- [ ] Touch controls are visible (they hide themselves when a mouse is attached)
+- [ ] Buttons are comfortable to hit — they are sized to a 48 dp physical minimum
+- [ ] No control sits under the notch, cutout or rounded corners, in either orientation
+- [ ] Walking up to the store door shows the "Enter store" prompt
+- [ ] Pressing the interact button enters the Store, and the City visibly unloads
+- [ ] Inside, the "Leave store" prompt appears at the door and returns you to the City,
+      arriving outside the store rather than at the street start
+- [ ] Footsteps are audible while walking and stop when standing still
+- [ ] `adb logcat -s Unity:V` shows no exceptions during any of the above
+- [ ] Nothing renders magenta
+- [ ] Both `PERF_LOG.md` rows filled in, City and Store
+
+### Reading the overlay
+
+The panel sits top-left. It only exists in a development build, which this APK is. The
+`perf` button top-right toggles it.
+
+```
+cur      17.3 ms          this frame
+median   16.9 ms (59 fps) typical frame — the comfortable number
+1% low   55 fps (18.1 ms) slowest 1% of frames  <-- THIS IS THE GATE
+draw 12  setpass 5        batching cost
+tris     3399             geometry on screen
+scene    City             which scene is resident
+samples  1000             frames in the rolling window
+```
+
+**`1% low` is the number that matters.** The Phase 0 decision recorded in `CLAUDE.md` is
+that "stable" means **1% low >= 30 fps** — an average hides exactly the hitching that
+makes a game feel broken.
+
+Method, so the numbers mean something:
+
+1. Walk continuously for about 20 seconds in the scene before reading, so `samples`
+   reaches 1000 and the window is full. A reading taken on arrival is mostly idle frames.
+2. Read `median` and `1% low`, and the `draw`/`tris` line, into the matching
+   `PERF_LOG.md` row.
+3. Do it three times per scene and **record the worst**, not the best. The gate is about
+   bad frames.
+4. `draw` and `tris` will read `n/a` on a non-development build — expected, the Profiler
+   module is stripped there.
+
+For reference, the editor reported City at 12 draw calls / 3,399 tris and Store at 11 /
+2,013 — but **editor frame times are not device numbers**, so do not copy the fps figures
+across.
