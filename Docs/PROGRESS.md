@@ -197,3 +197,40 @@ power-only USB port, or the cable not fully seated.
 
 Both `PERF_LOG.md` rows and the City/Store screenshots stay empty until the device is
 reachable. **The Phase 1 gate cannot be met without them.**
+
+### Step A — unused package removal
+
+| Commit | What |
+|---|---|
+| `5ce7fb8` | Removed `com.unity.ai.inference`, `com.unity.visualscripting`, `com.unity.multiplayer.center`, `com.unity.collab-proxy` |
+
+Verified: all four absent from `manifest.json` and from the rewritten
+`packages-lock.json` (so none came back as a transitive dependency), no
+`Library/PackageCache` directory remains for any of them, the MCP reconnected and
+reported `ready`, and the project compiles clean (zero `error CS`,
+`Assembly-CSharp.dll` rebuilt).
+
+Expected saving: ~10 of the ~28 Android build minutes, which went on 44 Sentis
+compute shaders.
+
+### Known tooling problem — editor main thread wedges
+
+Recurring and **not** caused by the package removal (it happened before any removal):
+the editor's main thread intermittently blocks, after which every MCP call that needs
+the main thread times out at 60 s while `console`'s own `groundTruth` still reports the
+editor healthy and idle (CPU flat). The editor log shows
+`Failed to handle /api/exec request: Main thread operation timed out`, alongside
+`Account API did not become accessible within 30 seconds ... may be due to network
+issues or editor focus` from `com.unity.ai.assistant`.
+
+`editor_focus` sometimes clears it; when the main thread is already blocked, neither
+`editor_focus` nor an OS-level `SetForegroundWindow` gets through and only an editor
+restart recovers it. Each restart costs ~10 minutes of project load.
+
+**Likely root cause and a candidate fix, not yet applied:** `com.unity.ai.assistant`
+blocking on an Account API check that cannot succeed because of the Unity licence
+entitlement `404`s recorded in `TOOLCHAIN.md`. `com.unity.pipeline` — the package that
+actually hosts the MCP server — does **not** depend on `com.unity.ai.assistant`, so
+removing it looks safe and would probably stop the wedging. Left in place because it is
+outside the agreed scope and the MCP is the only channel into the editor; worth deciding
+before Phase 2.
