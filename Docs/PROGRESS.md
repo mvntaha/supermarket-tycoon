@@ -380,3 +380,39 @@ Method, so the numbers mean something:
 For reference, the editor reported City at 12 draw calls / 3,399 tris and Store at 11 /
 2,013 — but **editor frame times are not device numbers**, so do not copy the fps figures
 across.
+
+---
+
+## Phase 1 — Step E: the APK
+
+**Path: `Builds/Android/Stockwell-phase1-dev.apk`**
+(absolute: `C:\Users\ahmed\Supermarket Tycoon\Builds\Android\Stockwell-phase1-dev.apk`)
+
+| | |
+|---|---|
+| Result | built, 0 errors |
+| **Build time** | **905 s — 15 min 5 s** |
+| **APK size** | **38,561,425 bytes (36.78 MiB)** |
+| Type | development build, `PerfOverlay` active |
+| Format | APK, not AAB |
+| Backend / arch | IL2CPP / ARM64 |
+
+Verified by inspecting the archive rather than trusting the report: `lib/` contains
+**`arm64-v8a/` only** — no `armeabi-v7a`, no `x86` — with `libil2cpp.so` (63.4 MB
+uncompressed), `libunity.so`, `libmain.so`, `libgame.so`, `libc++_shared.so` and
+`lib_burst_generated.so`.
+
+### The package removal paid off more than estimated
+
+| | Phase 0 (empty scene) | Phase 1 (full content) |
+|---|---|---|
+| Build time | 27 min 49 s | **15 min 5 s** |
+| APK size | 44,845,533 B (42.77 MiB) | **38,561,425 B (36.78 MiB)** |
+
+The Phase 1 build is **46% faster and 6 MiB smaller than the Phase 0 build that contained
+nothing** — three scenes, 108 building models, a HUD and 15 audio clips, and it still
+comes out ahead. The estimate going in was "roughly a third off"; removing
+`com.unity.ai.inference` and the other three beat that.
+
+`PerfOverlay` is present because this is a development build. It destroys itself on a
+release build, so it cannot ship by accident.
