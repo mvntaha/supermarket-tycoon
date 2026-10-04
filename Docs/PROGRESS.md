@@ -268,14 +268,19 @@ The overlay in the captures reports **City: 12 draw calls, 5 SetPass, 3,399 tris
 the shared-material decision from Task 1 paying off — embedded materials would have put
 this near 108.
 
-### Two real bugs found and fixed during the test
+### Two findings from the test
 
-**1. `Run In Background` was off.** The first Store transition froze mid-flight:
-`IsTransitioning` stuck true, both City and Store resident, `CurrentScene` never
-advancing. Nothing was wrong with `SceneService` — play mode simply stops ticking when
-the editor loses focus, so the coroutine never resumed, and every MCP call made the
-editor lose focus. Set `PlayerSettings.runInBackground = true`. Without this, any
-coroutine-based test driven over the MCP will appear to hang.
+**1. Play mode stalls when the editor loses focus.** The first Store transition froze
+mid-flight: `IsTransitioning` stuck true, both City and Store resident, `CurrentScene`
+never advancing. Nothing was wrong with `SceneService` — play mode stops ticking when the
+editor is not focused, so the coroutine never resumed, and every MCP call takes focus
+away. Calling `editor_focus` let it run to completion immediately.
+
+`PlayerSettings.runInBackground` would also fix it, and was tried, but it is
+**deliberately left off** (`runInBackground: 0`): for a mobile build the app should pause
+when backgrounded, which is what the autosave-on-pause rule in `CLAUDE.md` depends on.
+The working practice for MCP-driven play-mode tests is therefore to call `editor_focus`
+before each step, not to change the setting.
 
 **2. A false alarm worth recording.** The player read as still at the origin right after
 entering play mode, which looked like `PlayerSpawner` failing. It was measurement taken
