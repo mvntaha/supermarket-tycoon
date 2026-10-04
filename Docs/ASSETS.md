@@ -304,3 +304,81 @@ This is better than a per-model conversion would have been. Embedded materials g
 separate material instances that cannot batch; one shared material is a single instance,
 which is what the "shared material atlases to keep draw calls low" rule in `CLAUDE.md`
 actually requires. `variation-b.png` stays available for a second colourway later.
+
+---
+
+# Phase 2 — Store core assets
+
+## Attribution record (Phase 2 additions)
+
+| Pack | Author | Licence | Imported | Download size | Credit required | Credit line |
+|---|---|---|---|---|---|---|
+| Low poly Supermarket 3D pack | PensamientoAzul | CC0 | 4 shelves, cashier counter, 19 products | 1,832,166 B (1.75 MB) | **No** (appreciated) | PensamientoAzul — pensamientoazul.itch.io |
+| Survival Kit | Kenney | CC0 | 4 crate/box models only | 1,948,174 B (1.86 MB) | **No** | Kenney — www.kenney.nl |
+| Food Kit 2.0 | Kenney | CC0 | 16 produce/bread models only | 4,606,270 B (4.39 MB) | **No** | Kenney — www.kenney.nl |
+
+Freezers, the shopping cart, the toaster and the standalone door were **not** imported —
+they belong to later phases. Of Kenney's 80 survival and 200 food models, only 20 are in
+the project.
+
+The Supermercado archive ships **no licence file**; its terms are recorded verbatim from
+the asset page in `Assets/ThirdParty/PensamientoAzul/LICENSE.txt`.
+
+## Material reduction: one atlas for the whole store
+
+**Everything in the store runs on a single material, `Assets/_Project/Art/Store_Atlas.mat`.
+Verified: 57 prefabs, 57 renderer material slots, 1 distinct material.**
+
+The approach is a UV remap onto one 1024×1024 palette atlas, chosen over a flat-colour
+shared material because the three source packs needed reconciling anyway and they had
+incompatible conventions. The two Kenney kits each ship a 512×512 `colormap.png` palette
+that their UVs already index, but they are *different* palettes, so they cannot simply
+share a material. The Supermercado models carry no texture at all — just 38 flat-colour
+materials with Spanish names. The atlas therefore holds both Kenney colormaps at native
+512×512 resolution in its top half (Survival Kit top-left, Food Kit top-right) and a grid
+of 32×32 px flat palette cells in its bottom half, one per Supermercado colour plus 20 more
+for the in-house SKUs, 58 cells in all. Kenney meshes are remapped with a uniform
+`uv × 0.5 + quadrantOffset`, which preserves their texel-exact sampling; Supermercado
+meshes have every submesh's UVs collapsed onto the single palette cell matching that
+submesh's original colour, and their submeshes merged, so a 2-material apple becomes a
+1-submesh mesh. Measured UV ranges confirmed both Kenney kits stay well inside their
+quadrants (max U 0.969 → 0.485), so there is no bleed at the seam, and the atlas imports
+with point filtering and mipmaps off so neighbouring palette cells can never average
+together.
+
+### Recovering the Supermercado colours
+
+The models first imported as **uniform grey**. Unity's default
+`ImportViaMaterialDescription` was not mapping the FBX's diffuse colours to URP, even
+though inspecting the FBX binary showed `DiffuseColor`/`ColorRGB` records present.
+Switching the model importers to `ImportStandard` recovered the author's real palette —
+`manzanaRojo` #98351A, `lechuga` #598C38, `cheese` #ECE45B and so on, 37 of 38 non-grey.
+Without this the whole pack would have had to be recoloured by hand.
+
+### Scale and pivots
+
+The author warns on the asset page that the models "do not have the same size or
+consistent scale", and the FBX files turned out to be modelled in **inches**
+(`fileScale 0.0254`). Scale is normalised per pack, which preserves relative sizes within
+a pack rather than flattening everything to one size: Supermercado ×4.0, Kenney Food Kit
+×0.6, Kenney Survival Kit ×1.6. Every pivot is moved to base-centre, so a product sits on
+a shelf at y = 0 with no per-prefab offset. Verified: **44 of 44 imported meshes have a
+single submesh and their base exactly at y = 0.**
+
+Spot-checked results: milk carton 0.27 m tall, shelf unit 1.52 × 1.16 m, cashier counter
+2.07 m, delivery box 0.40 m.
+
+## In-house SKUs (13)
+
+Authored procedurally on the same atlas to fill the canned and household gap the Phase 0
+research flagged as the two thinnest categories:
+
+| | |
+|---|---|
+| Boxes | Cereal, Crisps, Pasta, Rice, Tea, Toilet roll pack |
+| Cans | Beans, Soup, Tuna |
+| Bottles | Cola, Water, Detergent, Bleach |
+
+Each is a generated mesh — box or stacked cylinder — with per-face UVs pointing at palette
+cells, so they cost nothing extra in materials and batch with everything else. Total
+geometry across all 57 store prefabs is 33,824 triangles.

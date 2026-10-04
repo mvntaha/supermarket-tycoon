@@ -1,0 +1,58 @@
+08 - Default	0
+01 - Default	1
+No Name	2
+07 - Default	3
+02 - Default	4
+03 - Default	5
+polloHueso	6
+pollo	7
+Pasta	8
+pastaCaja	9
+blanco	10
+carne	11
+cheese	12
+carton	13
+etiqueta	14
+JugoEtiquta	15
+uvaTonco	16
+grape	17
+FishBody	18
+09 - Default	19
+lechugaCentro	20
+lechuga	21
+bananaYellow	22
+bananaBlack	23
+hOja	24
+manzanaRojo	25
+chocolate	26
+chocolateEnvo	27
+HuevoCarton	28
+huevo	29
+cafe	30
+cafeEtiqueta	31
+tomateHoja	32
+tomate	33
+panPan	34
+cortesa	35
+YogurtTapa	36
+Yogurt	37
+sku.cereal.body	38
+sku.cereal.label	39
+sku.crisps.body	40
+sku.crisps.label	41
+sku.rice.body	42
+sku.rice.label	43
+sku.beans.body	44
+sku.beans.label	45
+sku.soup.body	46
+sku.tuna.body	47
+sku.cola.body	48
+sku.cola.label	49
+sku.water.body	50
+sku.detergent.body	51
+sku.detergent.label	52
+sku.bleach.body	53
+sku.toiletroll.body	54
+sku.metal.lid	55
+sku.cardboard	56
+sku.darkLabel	57
