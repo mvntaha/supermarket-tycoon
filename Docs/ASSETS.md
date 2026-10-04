@@ -1,6 +1,12 @@
 # ASSETS.md — Stockwell asset plan
 
-Phase 0 shortlist. Researched 2026-10-04. Nothing has been downloaded yet — this is the plan to approve before Phase 1 imports anything.
+Phase 0 shortlist, researched 2026-10-04 and approved at the `phase-0-research` gate.
+
+**Status:** three packs downloaded and imported in Phase 1 — Kenney **Modular Buildings**,
+**UI Pack** and **Impact Sounds** (subset), 3.67 MB in total. Everything else in this
+document remains a plan, pulled in at the phase that needs it: products and fixtures in
+Phase 2, characters in Phase 3, the city and the remaining audio in Phase 5. See the
+[attribution record](#attribution-record) for what is actually in the project.
 
 **Strategy: Kenney is the spine, Quaternius is the second voice, everything else is a patch.** Both are CC0, both are clean bright low-poly, and between them they cover every category except retail-specific fixtures. Keeping the count of authors low is what keeps the game looking like one game.
 
