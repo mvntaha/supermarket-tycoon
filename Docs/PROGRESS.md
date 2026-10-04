@@ -234,3 +234,62 @@ actually hosts the MCP server — does **not** depend on `com.unity.ai.assistant
 removing it looks safe and would probably stop the wedging. Left in place because it is
 outside the agreed scope and the MCP is the only channel into the editor; worth deciding
 before Phase 2.
+
+---
+
+## Phase 1 — Step C: editor smoke test
+
+Run through the MCP in play mode from the Bootstrap scene, because no phone was
+attached. **Editor frame times are not device numbers, so the `PERF_LOG.md` rows stay
+pending** until the on-device run.
+
+| Check | Result |
+|---|---|
+| Bootstrap loads City | **pass** — `currentScene=City`, scenes `Bootstrap + City`, `targetFrameRate=60` |
+| Player moves | **pass** — travelled 18.79 m along facing; `PlanarSpeed` 3.20, exactly `GameSettings.WalkSpeed` |
+| Player looks | **pass** — yaw 90°→122° (+32.0 = 400 × 0.08 touch sensitivity), pitch 0°→−16.0° (= 200 × 0.08) |
+| Door loads Store, unloads City | **pass** — `currentScene=Store`, loaded scenes `Bootstrap + Store`, City gone |
+| Spawn point honoured (City→Store) | **pass** — player at z −4.10, which is `doorZ + 2.2` = StoreEntrance |
+| Reverse Store→City | **pass** — `currentScene=City`, Store unloaded, player at z 5.52 = CityOutsideStore |
+| Raycast interaction + prompt | **pass** — `PlayerInteractor.Current` = "Leave store", `CanInteract` true, HUD prompt visible reading "Leave store" |
+| HUD inside safe area, 16:9 | **pass** — 1920×1080, safe root inset 8 px, **16 of 16 graphics inside, 0 outside** |
+| HUD inside safe area, 21:9 | **pass** — 2560×1080 (aspect 2.370), **16 of 16 inside, 0 outside** |
+| Touch controls hidden on desktop | **pass** — `TouchControls` exists with 3 buttons but `activeSelf=false`, because a mouse is present (`UsingTouch=false`) |
+| No console errors | **pass** — 0 errors. One warning, the pre-existing `com.unity.ai.assistant` Account API message, unrelated to this work |
+| No magenta materials | **pass** — 8 renderer material slots, **0 broken, 0 null**, every one on `Universal Render Pipeline/Lit`; no `Hidden/InternalErrorShader` anywhere |
+
+Screenshots: [City, 16:9](Screenshots/phase1_city_16x9.png) and
+[Store, 21:9](Screenshots/phase1_store_21x9.png).
+
+### Batching is working
+
+The overlay in the captures reports **City: 12 draw calls, 5 SetPass, 3,399 tris** and
+**Store: 11 draw calls, 5 SetPass, 2,013 tris**. Ten buildings at twelve draw calls is
+the shared-material decision from Task 1 paying off — embedded materials would have put
+this near 108.
+
+### Two real bugs found and fixed during the test
+
+**1. `Run In Background` was off.** The first Store transition froze mid-flight:
+`IsTransitioning` stuck true, both City and Store resident, `CurrentScene` never
+advancing. Nothing was wrong with `SceneService` — play mode simply stops ticking when
+the editor loses focus, so the coroutine never resumed, and every MCP call made the
+editor lose focus. Set `PlayerSettings.runInBackground = true`. Without this, any
+coroutine-based test driven over the MCP will appear to hang.
+
+**2. A false alarm worth recording.** The player read as still at the origin right after
+entering play mode, which looked like `PlayerSpawner` failing. It was measurement taken
+before the spawn had applied — the teleport lands a frame or more after the scene
+finishes loading. Verified correct on the next read (player at CityStart, z −2.00).
+Nothing was changed for this.
+
+### One thing that could not be driven from the MCP
+
+`simulate_key` sets device state correctly — `Keyboard.current.eKey.isPressed` returned
+true — but the `InputAction.performed` callback did not fire from the synthetic event, so
+the keyboard leg of Interact could not be exercised this way. The action map was verified
+enabled with all five actions in `Waiting` phase, and the same code path was driven
+successfully through `InputService.FireInteract()`, which is exactly what `TouchButton`
+calls on pointer down. That completed the Store→City transition, so the
+input → interactor → door → scene-service chain is proven; only the synthetic-keystroke
+delivery is unproven. The keyboard bindings are worth a manual check in the editor.
