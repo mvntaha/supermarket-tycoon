@@ -162,7 +162,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29c64f4cbbad58544912b2d37d552f34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Stockwell.Input.InputService
-  actions: {fileID: 0}
+  actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   settings: {fileID: 11400000, guid: bfa76cd3195fdc249a728a8e7378ca35, type: 2}
 --- !u!114 &1995065908
 MonoBehaviour:
