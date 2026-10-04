@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 021f14a26087a5546b5e2687ab4d3f30, type: 3}
+  m_Name: drink_coffee
+  m_EditorClassIdentifier: Stockwell.Runtime::Stockwell.Data.ProductDefinition
+  id: drink.coffee
+  displayName: Ground Coffee
+  category: 0
+  marketPrice: 4.5
+  wholesaleCost: 2.4
+  slotSize: 1
+  unlockLevel: 3
+  icon: {fileID: 0}
+  prefab: {fileID: 852603275735334259, guid: a68e764c52f768245b54f2b04a372607, type: 3}
+  midpointRatio: 1.08
+  steepness: 9
