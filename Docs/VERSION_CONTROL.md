@@ -15,10 +15,17 @@ The branching model mirrors the phase gates in `CLAUDE.md`, so the git history r
 Current branches:
 
 ```
-main              ← phase gates only, tagged
-develop           ← integration
-phase/0-research  ← Phase 0 work (this phase)
+main                ← phase gates only, tagged. At tag phase-0-research.
+develop             ← integration. Phase 0 merged.
+phase/0-research    ← Phase 0 work. Merged via PR #1; kept for history.
+phase/1-foundation  ← Phase 1 work (current branch)
 ```
+
+| Branch | Merged | Tag |
+|---|---|---|
+| `phase/0-research` → `develop` | PR #1, merge `7cdc49b` | — |
+| `develop` → `main` | PR #2, merge `3a03422` | `phase-0-research` |
+| `phase/1-foundation` → `develop` | open | — |
 
 ## The loop, per phase
 

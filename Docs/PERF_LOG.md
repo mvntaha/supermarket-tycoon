@@ -24,12 +24,20 @@ measure against. Dropping it to 30 is a Phase 6 decision.
 
 | Phase | Date | Device | Android | Scene | Median ms | 1% low fps | Draw calls | Tris | APK size |
 |---|---|---|---|---|---|---|---|---|---|
-| 1 | _pending_ | _pending_ | _pending_ | City | | | | | |
-| 1 | _pending_ | _pending_ | _pending_ | Store | | | | | |
+| 1 | _pending_ | _pending_ | _pending_ | City | | | | | 36.78 MiB |
+| 1 | _pending_ | _pending_ | _pending_ | Store | | | | | 36.78 MiB |
 
-> Phase 1 rows are filled from the on-device run in Task 8. The device was not
-> attached at the time the build was produced; see `PROGRESS.md` for status.
-
+> **Both rows are deliberately empty.** They are filled from the on-device run in Task 8,
+> which the user runs themselves. The APK exists
+> (`Builds/Android/Stockwell-phase1-dev.apk`, 38,561,425 B / 36.78 MiB, development
+> build) but no phone was reachable, so there are no device numbers yet.
+>
+> The editor smoke test measured City at 12 draw calls / 3,399 tris and Store at 11 /
+> 2,013, recorded in `PROGRESS.md`. **Those are not device numbers and must not be copied
+> into this table** — an editor on a desktop GPU tells you nothing about a phone's frame
+> time. Draw calls and triangle counts do carry over; frame times do not.
+>
+> See the "Device test checklist" in `PROGRESS.md` for how to take the readings.
 ## Notes
 
 - Readings are taken after ~20 s of walking in the scene, so the rolling window is full.

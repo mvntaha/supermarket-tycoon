@@ -1,6 +1,12 @@
 # ASSETS.md — Stockwell asset plan
 
-Phase 0 shortlist. Researched 2026-10-04. Nothing has been downloaded yet — this is the plan to approve before Phase 1 imports anything.
+Phase 0 shortlist, researched 2026-10-04 and approved at the `phase-0-research` gate.
+
+**Status:** three packs downloaded and imported in Phase 1 — Kenney **Modular Buildings**,
+**UI Pack** and **Impact Sounds** (subset), 3.67 MB in total. Everything else in this
+document remains a plan, pulled in at the phase that needs it: products and fixtures in
+Phase 2, characters in Phase 3, the city and the remaining audio in Phase 5. See the
+[attribution record](#attribution-record) for what is actually in the project.
 
 **Strategy: Kenney is the spine, Quaternius is the second voice, everything else is a patch.** Both are CC0, both are clean bright low-poly, and between them they cover every category except retail-specific fixtures. Keeping the count of authors low is what keeps the game looking like one game.
 
@@ -275,3 +281,26 @@ Only the files actually used, rather than all 130:
 
 15 clips. The pack has no `impactWood`; `impactGeneric_light` is the closest match for
 a cardboard box and is the lightest-sounding of the available impact families.
+
+### Modular Buildings — material fix applied at import
+
+The pack does **not** drop into URP cleanly, but not in the way the risk list expected.
+Unity imported all 108 models on `Universal Render Pipeline/Lit` (so **no magenta**), but
+every one arrived with `_BaseMap` **unassigned**: the FBX files reference a material named
+`colormap`, while the pack ships its textures as `variation-a.png` and `variation-b.png`.
+The names do not match, so Unity could not resolve the texture and the buildings imported
+untextured.
+
+Fix: one shared material asset at
+`Assets/ThirdParty/Kenney/ModularBuildings/Materials/colormap.mat` (URP/Lit,
+`_BaseMap` = `variation-a`, metallic 0, smoothness 0.05, specular highlights off), with
+every model importer switched from embedded materials to
+`materialLocation: External` + `materialSearch: RecursiveUp` so all 108 bind to it by name.
+
+Verified after the change: **108 of 108 renderer slots bound to the single shared
+material, all 108 textured, zero other materials, zero null slots.**
+
+This is better than a per-model conversion would have been. Embedded materials give 108
+separate material instances that cannot batch; one shared material is a single instance,
+which is what the "shared material atlases to keep draw calls low" rule in `CLAUDE.md`
+actually requires. `variation-b.png` stays available for a second colourway later.
