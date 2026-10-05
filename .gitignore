@@ -87,3 +87,6 @@ local.properties
 # Generated each build by com.unity.test-framework.performance
 /[Aa]ssets/[Rr]esources/PerformanceTestRunInfo.json*
 /[Aa]ssets/[Rr]esources/PerformanceTestRunSettings.json*
+
+# Unity/IL2CPP build scratch dir created during Android builds
+/.utmp/
