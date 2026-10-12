@@ -416,3 +416,90 @@ comes out ahead. The estimate going in was "roughly a third off"; removing
 
 `PerfOverlay` is present because this is a development build. It destroys itself on a
 release build, so it cannot ship by accident.
+
+---
+
+# Demo finalisation (FINALIZE_BRIEF)
+
+Branch `release/demo`, off `develop` at `f4a41f3`. The six-phase gating is replaced by
+milestones M0–M6.
+
+## M0 — Audit and unblock
+
+### M0.1 Status of Phase 1 and Phase 2
+
+**Phase 1 — complete in `Assets/`, editor-verified, device test never run.**
+
+| Task | In `Assets/` | State |
+|---|---|---|
+| 1 Folders + 3 Kenney packs, URP, attribution | `Assets/_Project/{Scripts,Prefabs,Data,Scenes,UI,Art,Audio}`, `Assets/ThirdParty/Kenney/*` | **works** |
+| 2 Bootstrap/City/Store scenes + `GameServices` | 3 scenes, `GameServices`, `Bootstrap`, `SceneService` | **works** — door swap verified both ways |
+| 3 One `Gameplay` action map + touch widgets | `InputSystem_Actions`, `InputService`, `TouchStick`, `LookDragArea`, `TouchButton` | **works** |
+| 4 Player controller, raycast, door | `PlayerController`, `PlayerInteractor`, `IInteractable`, `DoorInteractable`, `SpawnPoint`, `PlayerSpawner` | **works** |
+| 5 HUD, safe area, 48 dp | `HudController`, `SafeArea`, `MinTouchSize` | **works** — 16/16 graphics inside safe area at 16:9 and 21:9 |
+| 6 Quality, frame cap, perf overlay | `PerfOverlay`, Mobile quality level, `Mobile_RPAsset` | **works** |
+| 7 Footsteps | `FootstepPlayer` + 15 OGG | **works** — concrete set only |
+| 8 Device test | — | **never run.** No phone has been reachable |
+
+**Phase 2 — Tasks 0–3 complete, Tasks 4–8 never started.**
+
+| Task | In `Assets/` | State |
+|---|---|---|
+| 1 Store assets, one shared material | 57 prefabs, `Store_Atlas.mat`, 44 meshes | **works** — 57 slots, 1 material |
+| 2 Product data model + catalogue | `ProductDefinition`, `ProductCatalog`, `Pricing`, 24 product assets | **works** — 10 tests pass |
+| 3 Wallet / inventory / orders | `WalletService`, `InventoryService`, `OrderService`, `StoreSettings`, `EconomyInstaller` | **compiles, 20 tests pass** — but `EconomyInstaller` is **not on the Bootstrap scene object**, so services are not registered at runtime |
+| 4 Store tiles and shelf slots | — | **missing** |
+| 5 Instanced product rendering | — | **missing** |
+| 6 Ordering and delivery | — | **missing** |
+| 7 Carry, stock, price | — | **missing** |
+| 8 Build and verification | — | **missing** |
+
+Totals in `Assets/`: 35 scripts, 3 scenes, 57 prefabs, 24 product assets, 30 EditMode
+tests (all passing at last run).
+
+### M0.2 Unused packages — already done
+
+All four named packages were removed before this brief, in their own commits, each
+verified: absent from `manifest.json` **and** the rewritten `packages-lock.json`, no
+`Library/PackageCache` entry left, MCP reconnected, project compiled clean.
+
+| Package | Commit |
+|---|---|
+| `com.unity.ai.inference`, `com.unity.visualscripting`, `com.unity.multiplayer.center`, `com.unity.collab-proxy` | `5ce7fb8` (recorded in `48b5890`) |
+| `com.unity.ai.assistant` (extra — see below) | `84e0c57` |
+
+Removing `ai.inference` cut the Android build from 27 min 49 s to **15 min 5 s** and the
+APK from 42.77 MiB to 36.78 MiB. `com.unity.ai.assistant` was removed as well because its
+Account API check — which cannot succeed given the licence entitlement 404s — was wedging
+the editor main thread and costing a ~10-minute editor restart each time.
+
+### M0.3 Broken or half-integrated work
+
+One item found and fixed: the Phase 2 Task 3 economy work was written but uncommitted when
+the previous session ended. Verified it had compiled (both `Stockwell.Runtime.dll` and
+`Stockwell.EditModeTests.dll` contain the types) and committed it as `c305969`.
+
+**The project compiles with zero errors as of the last Unity compile (Oct 5, 03:18).**
+
+### Decisions taken without asking, per the brief
+
+- **`release/demo` is branched off `develop` *after* merging the completed part of Phase 2**
+  (PR #5). Branching off `develop` as-is would have silently dropped Tasks 0–3.
+- Phase 2 Tasks 4–8 are **not** treated as debt to repay separately; they are folded into
+  M1, which covers the same ground scaled to demo needs.
+
+## M0 BLOCKED — work cannot continue past this point
+
+Two independent blockers, both outside what this session can fix.
+
+**1. The Unity MCP server is disconnected.** All 160 `mcp__unity-editor-mcp__*` tools were
+removed from the session. The Unity editor process is still running, but there is no
+channel to it: no Play mode, no `simulate_key`/`simulate_pointer`, no `capture_game_view`,
+no `bake_navmesh`, no scene editing, no EditMode test runs, no builds. M1–M6 depend on
+these for essentially every acceptance criterion.
+
+**2. Free disk is 7.62 GB**, below the 10 GB floor this brief sets for builds. Android
+IL2CPP builds need several GB of transient space; the Phase 0 build already failed once at
+0 bytes free and corrupted the Gradle cache.
+
+What *was* completed under M0 is listed above and is committed and pushed.
