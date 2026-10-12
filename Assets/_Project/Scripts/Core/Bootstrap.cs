@@ -1,3 +1,4 @@
+using System;
 using Stockwell.Input;
 using Stockwell.World;
 using UnityEngine;
@@ -13,6 +14,10 @@ namespace Stockwell.Core
         [Header("Services")]
         [SerializeField] private InputService inputService;
         [SerializeField] private SceneService sceneService;
+
+        [Header("Installers")]
+        [Tooltip("Components registering further services. Called in array order after the registry is cleared, so startup order stays explicit rather than depending on Unity's component execution order.")]
+        [SerializeField] private MonoBehaviour[] installers = Array.Empty<MonoBehaviour>();
 
         [Header("Config")]
         [SerializeField] private GameSettings settings;
@@ -56,7 +61,37 @@ namespace Stockwell.Core
                 Debug.LogError("[Bootstrap] No SceneService assigned.");
             }
 
+            InstallExtraServices();
+
             DontDestroyOnLoad(gameObject);
+        }
+
+        /// <summary>
+        /// Runs after the core services are in place, so an installer may depend on them.
+        /// </summary>
+        private void InstallExtraServices()
+        {
+            if (installers == null)
+            {
+                return;
+            }
+
+            foreach (var m in installers)
+            {
+                if (m == null)
+                {
+                    continue;
+                }
+
+                if (m is IServiceInstaller installer)
+                {
+                    installer.Install();
+                }
+                else
+                {
+                    Debug.LogError($"[Bootstrap] {m.GetType().Name} is listed as an installer but does not implement IServiceInstaller.");
+                }
+            }
         }
 
         private void Start()
