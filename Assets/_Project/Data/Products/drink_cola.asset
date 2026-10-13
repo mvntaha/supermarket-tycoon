@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 021f14a26087a5546b5e2687ab4d3f30, type: 3}
+  m_Name: drink_cola
+  m_EditorClassIdentifier: Stockwell.Runtime::Stockwell.Data.ProductDefinition
+  id: drink.cola
+  displayName: Cola Bottle
+  category: 0
+  marketPrice: 1.6
+  wholesaleCost: 0.75
+  slotSize: 1
+  unlockLevel: 1
+  icon: {fileID: 0}
+  prefab: {fileID: 1129104683060851032, guid: ab854da819a94dc4eb463b444e0f2f69, type: 3}
+  midpointRatio: 1.08
+  steepness: 9

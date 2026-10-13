@@ -1,0 +1,22 @@
+Low poly Supermarket 3D pack Assets (fbx)
+by PensamientoAzul
+https://pensamientoazul.itch.io/supermarket-3d-assets
+
+LICENSE: CC0
+
+Quoted from the asset page, 2026-10-05:
+
+  "LICENSE (CC0)
+   This asset pack can be used in both free and commercial projects.
+   You can modify, remix, or build upon it as needed.
+   Credit would be much appreciated.
+   A link back to the original asset or my profile is appreciated!"
+
+Credit is appreciated but not required. Stockwell credits it anyway in the
+Credits screen (Phase 5).
+
+NOTE: the downloaded archive (Supermercado.zip) contains no LICENSE file of its
+own, so this file records the terms as stated on the asset page. The author also
+states on that page: "Please note that they do not have the same size or
+consistent scale." Stockwell normalises scale and pivots on import - see
+Docs/ASSETS.md.
